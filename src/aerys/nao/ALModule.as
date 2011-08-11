@@ -36,8 +36,8 @@ package aerys.nao
 			if (!method)
 			{
 				method = new ALMethod(methodName, _broker, this);
-				//method.addEventListener(ALMethodEvent.CALL, methodHandler);
-				//method.addEventListener(ALMethodEvent.RESULT, methodHandler);
+				method.addEventListener(ALMethodEvent.CALL, methodHandler);
+				method.addEventListener(ALMethodEvent.RESULT, methodHandler);
 				
 				_methods[methodName] = method;
 			}
@@ -47,17 +47,12 @@ package aerys.nao
 		
 		override protected function callProperty(name : *, ...rest) : *
 		{
-			var method : ALMethod = getProperty(name);
-			
-			method.call(rest);
-			
-			return new ALMethodCall(method);
+			return (getProperty(name) as ALMethod).call(rest);;
 		}
 		
 		private function methodHandler(event : ALMethodEvent) : void
 		{
-			if (event.bubbles)
-				dispatchEvent(event);
+			dispatchEvent(event);
 		}
 	}
 }

@@ -24,6 +24,10 @@ package aerys.nao
 		
 		private var _uuids		: Array		= new Array();
 		
+		public function get name()		: String	{ return _name; }
+		public function get broker()	: ALBroker	{ return _broker; }
+		public function get module() 	: ALModule	{ return _module; }
+		
 		public function ALMethod(name	: String,
 								 broker : ALBroker,
 								 module	: ALModule)
@@ -35,37 +39,18 @@ package aerys.nao
 			_module = module;
 		}
 		
-		public function call(...arguments) : void
+		public function call(...arguments) : ALMethodCall
 		{
-			var uuid		: Uuid 		= new Uuid();
+			var call : ALMethodCall	= new ALMethodCall(this, arguments[0][0]);
 			
-			var command_s 	: String	= XMLRPCSerializer.serialize(_module.name + "." + _name, arguments[0][0]);
-			var prev		: String	= "<iq xmlns=\"jabber:client\" to=\"" + _broker.currentDevice + "\"" 
-										  + " id=\"" + uuid + "\""
-										  + " type=\"set\"><query xmlns=\"jabber:iq:rpc\">";
-			var post		: String 	= "</query></iq>";
-			var resComm		: String 	= prev + command_s + post;
+			call.addEventListener(ALMethodEvent.RESULT, callResultHandler);
 			
-			_broker.addIqHandler(uuid.toString(), responseHandler);
-			_broker.send(resComm);
-			
-			dispatchEvent(new ALMethodEvent(ALMethodEvent.CALL, _module.name, _name, arguments));
+			return call;
 		}
 		
-		private function responseHandler(response : XML) : void
+		private function callResultHandler(event : ALMethodEvent) : void
 		{
-			var data : Object = null;
-
-			if (response)
-			{
-				var nsRegEx		: RegExp 		= new RegExp(" xmlns(?:.*?)?=\".*?\"", "gim");
-				var xmlString	: String		= response.toString();
-				var xmlDocument : XMLDocument 	= new XMLDocument(xmlString.replace(nsRegEx, ""));
-				
-				data = XMLRPCSerializer.deserialize(xmlDocument);
-			}
-
-			dispatchEvent(new ALMethodEvent(ALMethodEvent.RESULT, _module.name, _name, data));
+			dispatchEvent(event);
 		}
 	}
 }
