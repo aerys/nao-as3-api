@@ -4,12 +4,17 @@ package aerys.nao.event
 	
 	public class ALEvent extends Event
 	{
-		public static const CONNECTED			: String	= "al_connected";
-		public static const DEVICE_AVAILABLE	: String	= "al_device_available";
+		public static const CONNECTED			: String	= "connected";
+		public static const DEVICE_AVAILABLE	: String	= "deviceAvailable";
 		
 		public function ALEvent(type : String)
 		{
 			super(type);
+		}
+		
+		override public function clone() : Event
+		{
+			return new ALEvent(type);
 		}
 	}
 }

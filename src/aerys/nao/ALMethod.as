@@ -5,9 +5,11 @@ package aerys.nao
 	
 	import com.ak33m.rpc.xmlrpc.XMLRPCSerializer;
 	
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.xml.XMLDocument;
+	import aerys.nao.ns.nao;
 	
 	[Event(name="call", type="aerys.nao.event.ALMethodEvent")]
 	[Event(name="result", type="aerys.nao.event.ALMethodEvent")]
@@ -45,12 +47,23 @@ package aerys.nao
 			
 			call.addEventListener(ALMethodEvent.RESULT, callResultHandler);
 			
+			dispatchEvent(new ALMethodEvent(ALMethodEvent.CALL,
+											_module.name,
+											_name,
+											arguments));
+			
 			return call;
 		}
 		
 		private function callResultHandler(event : ALMethodEvent) : void
 		{
-			dispatchEvent(event);
+			if (event.bubbles)
+			{
+				dispatchEvent(new ALMethodEvent(ALMethodEvent.RESULT,
+												event.module,
+												event.method,
+												event.data));
+			}
 		}
 	}
 }

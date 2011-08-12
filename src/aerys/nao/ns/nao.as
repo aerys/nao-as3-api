@@ -1,5 +1,5 @@
 // ActionScript file
-package aerys.nao
+package aerys.nao.ns
 {
 	public namespace nao;
 }

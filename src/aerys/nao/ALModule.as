@@ -6,6 +6,7 @@ package aerys.nao
 	import flash.events.IEventDispatcher;
 	import flash.utils.Proxy;
 	import flash.utils.flash_proxy;
+	import aerys.nao.utils.ProxyEventDispatcher;
 	
 	[Event(name="call", type="aerys.nao.event.ALMethodEvent")]
 	[Event(name="result", type="aerys.nao.event.ALMethodEvent")]

@@ -1,15 +1,23 @@
 package aerys.nao
 {
-	import aerys.nao.event.ALEvent;
 	import aerys.nao.event.ALMethodEvent;
+	import aerys.nao.rpc.XMLRPCDeserializer;
+	import aerys.nao.rpc.XMLRPCType;
 	
 	import com.ak33m.rpc.xmlrpc.XMLRPCSerializer;
 	
 	import flash.events.EventDispatcher;
+	import flash.utils.setTimeout;
 	import flash.xml.XMLDocument;
+	import aerys.nao.ns.nao;
+	import aerys.nao.utils.Uuid;
 
 	public class ALMethodCall extends EventDispatcher
 	{
+		use namespace nao;
+		
+		private static const NS	: Namespace	= new Namespace("jabber:iq:rpc");
+		
 		private var _method		: ALMethod	= null;
 		private var _handlers	: Array		= new Array();
 		
@@ -22,7 +30,11 @@ package aerys.nao
 		
 		public function onResult(callback : Function) : ALMethodCall
 		{
-			addEventListener(ALMethodEvent.RESULT, callback);
+			addEventListener(ALMethodEvent.RESULT,
+							 function(event : ALMethodEvent) : void
+							 {
+								 callback.call(null, event.data);
+							 });
 			
 			return this;
 		}
@@ -51,17 +63,18 @@ package aerys.nao
 			
 			if (response)
 			{
-				var nsRegEx		: RegExp 		= new RegExp(" xmlns(?:.*?)?=\".*?\"", "gim");
-				var xmlString	: String		= response.toString();
-				var xmlDocument : XMLDocument 	= new XMLDocument(xmlString.replace(nsRegEx, ""));
+				var nsRegEx		: RegExp 	= / xmlns(?:.*?)?=\".*?\"/gim;
+				var xmlString	: String	= response.toString();
 				
-				data = XMLRPCSerializer.deserialize(xmlDocument);
+				data = XMLRPCDeserializer.deserialize(new XML(xmlString.replace(nsRegEx, "")));
 			}
 			
-			dispatchEvent(new ALMethodEvent(ALMethodEvent.RESULT,
-											_method.module.name,
-											_method.name,
-											data));
+			var event : ALMethodEvent = new ALMethodEvent(ALMethodEvent.RESULT,
+				_method.module.name,
+				_method.name,
+				data);
+			
+			dispatchEvent(event);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package aerys.nao
+package aerys.nao.utils
 {
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -6,7 +6,7 @@ package aerys.nao
 	import flash.utils.Proxy;
 	import flash.utils.flash_proxy;
 	
-	internal dynamic class ProxyEventDispatcher extends Proxy implements IEventDispatcher
+	public dynamic class ProxyEventDispatcher extends Proxy implements IEventDispatcher
 	{
 		private var _eventDispatcher	: EventDispatcher	= new EventDispatcher();
 		
@@ -40,7 +40,7 @@ package aerys.nao
 		public function dispatchEvent(event	: Event) : Boolean
 		{
 			return willTrigger(event.type)
-				   ?_eventDispatcher.dispatchEvent(event)
+				   ? _eventDispatcher.dispatchEvent(event.clone())
 				   : false;
 		}
 		

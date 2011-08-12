@@ -2,8 +2,9 @@ package aerys.nao
 {
 	import aerys.nao.event.ALEvent;
 	import aerys.nao.event.ALMethodEvent;
+	import aerys.nao.ns.nao;
+	import aerys.nao.utils.ProxyEventDispatcher;
 	
-	import com.ak33m.rpc.xmlrpc.XMLRPCSerializer;
 	import com.hurlant.crypto.Crypto;
 	import com.hurlant.crypto.hash.IHash;
 	import com.hurlant.crypto.tls.TLSConfig;
@@ -15,19 +16,10 @@ package aerys.nao
 	import com.seesmic.as3.xmpp.XMPP;
 	import com.seesmic.as3.xmpp.XMPPEvent;
 	
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher;
 	import flash.utils.ByteArray;
-	import flash.utils.Dictionary;
-	import flash.utils.Proxy;
-	import flash.utils.flash_proxy;
-	
-	import mx.collections.ArrayCollection;
-	import mx.rpc.events.HeaderEvent;
 	
 	[Event(name="connected", type="aerys.nao.event.ALEvent")]
-	[Event(name="devices", type="aerys.nao.event.ALEvent")]
+	[Event(name="deviceAvailable", type="aerys.nao.event.ALEvent")]
 	[Event(name="call", type="aerys.nao.event.ALMethodEvent")]
 	[Event(name="result", type="aerys.nao.event.ALMethodEvent")]
 	
@@ -35,33 +27,24 @@ package aerys.nao
 	{
 		use namespace nao;
 		
-		private static const NS	: Namespace	= new Namespace("jabber:iq:rpc");
+		private static const NS		: Namespace	= new Namespace("jabber:iq:rpc");
 		
 		private var _username		: String			= null;
 		
 		private var _xmpp			: XMPP				= null;
 		
-		private var _dispatcher		: EventDispatcher	= null;
 		private var _modules		: Object			= new Object();
 		private var _iqHandlers		: Object			= new Object();
 		
-		private var _devices		: ArrayCollection	= new ArrayCollection();
+		private var _devices		: Array				= new Array();
 		private var _currentDevice	: String			= null;
 		
+		public function get devices() 		: Array		{ return _devices; }
 		public function get currentDevice() : String	{ return _currentDevice; }
 		
 		public function set currentDevice(value : String) : void
 		{
 			_currentDevice = value;
-		}
-		
-		public function get availableDevices() : ArrayCollection	{ return _devices; }
-		
-		public function ALBroker()
-		{
-			super();
-			
-			_dispatcher = new EventDispatcher(this);
 		}
 		
 		public function connect(host 		: String,
@@ -127,8 +110,8 @@ package aerys.nao
 			var xml 	: XML 		= new XML(event.stanza.body);
 			
 			if (xml..NS::fault.length() != 0)
-				throw new Error(xml..NS::value.NS::string,
-								xml..NS::value.NS::int);
+				throw new Error((xml..NS::value.NS::string[0] as XML).toString(),
+								xml..NS::value.NS::int.toString());
 			
 			var iqId 	: String 	= xml.@id;
 			var handler : Function 	= _iqHandlers[iqId];
@@ -146,13 +129,20 @@ package aerys.nao
 			var from 	: String 	= event.stanza.from;
 			var match 	: Array 	= from.match(/^.*\/(nao-[0-9]+)$/);
 			
-			if (match && match.length == 2 && !_devices.contains(match[1]))
-				_devices.addItem(match[1]);
+			if (match && match.length == 2)
+			{
+				for (var i : int = 0; i < _devices.length && _devices[i] != match[1]; ++i)
+					continue ;
+			
+				if (i >= _devices.length)
+					_devices.push(match[1]);
+			}
+			
+			dispatchEvent(new ALEvent(ALEvent.DEVICE_AVAILABLE));
 		}
 
 		nao function send(data : String, to : String = null) : void
 		{
-//			_xmpp.sendMessage(to || _dst, data);
 			_xmpp.sendMessage(_username + "/" + _currentDevice, data);
 		}
 		

@@ -1,4 +1,4 @@
-package aerys.nao
+package aerys.nao.utils
 {
 	import flash.system.System;
 	import flash.utils.ByteArray;

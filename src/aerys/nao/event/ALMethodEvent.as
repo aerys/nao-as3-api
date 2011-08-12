@@ -4,8 +4,8 @@ package aerys.nao.event
 	
 	public class ALMethodEvent extends Event
 	{
-		public static const RESULT	: String	= "al_result";
-		public static const CALL	: String	= "al_call";
+		public static const RESULT	: String	= "result";
+		public static const CALL	: String	= "call";
 		
 		private var _module	: String	= null;
 		private var _method	: String	= null;
@@ -25,6 +25,11 @@ package aerys.nao.event
 			_module = module;
 			_method = method;
 			_data = data;
+		}
+		
+		override public function clone() : Event
+		{
+			return new ALMethodEvent(type, _module, _method, _data);
 		}
 	}
 }
