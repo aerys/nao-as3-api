@@ -32,6 +32,7 @@ package aerys.nao
 		private var _username		: String			= null;
 		
 		private var _xmpp			: XMPP				= null;
+		private var _connected		: Boolean			= false;
 		
 		private var _modules		: Object			= new Object();
 		private var _iqHandlers		: Object			= new Object();
@@ -39,6 +40,7 @@ package aerys.nao
 		private var _devices		: Array				= new Array();
 		private var _currentDevice	: String			= null;
 		
+		public function get connected()		: Boolean	{ return _connected; }
 		public function get devices() 		: Array		{ return _devices; }
 		public function get currentDevice() : String	{ return _currentDevice; }
 		
@@ -74,31 +76,40 @@ package aerys.nao
 			_xmpp.addEventListener(XMPPEvent.PRESENCE_SUBSCRIBE, handlePresenceSubscribe);*/
 //			_xmpp.addEventListener(XMPPEvent.ROSTER_ITEM, rosterItemHandler);
 			
-			_xmpp.socket.addEventListener(StreamEvent.DISCONNECTED, socketHandler);
+			/*_xmpp.socket.addEventListener(StreamEvent.DISCONNECTED, socketHandler);
 			_xmpp.socket.addEventListener(StreamEvent.CONNECT_FAILED, socketHandler);
-			_xmpp.socket.addEventListener(StreamEvent.CONNECTED, socketHandler);
+			_xmpp.socket.addEventListener(StreamEvent.CONNECTED, socketHandler);*/
 			
 			_xmpp.setupTLS(TLSEvent, TLSConfig, TLSEngine, TLSSocket, true, true, false);
 			_xmpp.connect();
 		}
 		
-		private function socketHandler(event : StreamEvent) : void
+		public function disconnect() : void
 		{
+			_xmpp.disconnect();
+			_connected = false;
 		}
+		
+		/*private function socketHandler(event : StreamEvent) : void
+		{
+		}*/
 		
 		private function authSucceedHandler(event : XMPPEvent) : void
 		{
+			dispatchEvent(new ALEvent(ALEvent.AUTH_SUCCEED));
 		}
 		
 		private function authFailedHandler(event : XMPPEvent) : void
 		{
+			dispatchEvent(new ALEvent(ALEvent.AUTH_FAILED));
 		}
 		
 		private function sessionHandler(event : XMPPEvent) : void
 		{
 			_xmpp.getRoster();
 			_xmpp.sendPresence();
-			
+
+			_connected = true;
 			dispatchEvent(new ALEvent(ALEvent.CONNECTED));
 		}
 		

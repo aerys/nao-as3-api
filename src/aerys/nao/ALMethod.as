@@ -1,15 +1,9 @@
 package aerys.nao
 {
-	import aerys.nao.event.ALEvent;
 	import aerys.nao.event.ALMethodEvent;
-	
-	import com.ak33m.rpc.xmlrpc.XMLRPCSerializer;
-	
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher;
-	import flash.xml.XMLDocument;
 	import aerys.nao.ns.nao;
+	
+	import flash.events.EventDispatcher;
 	
 	[Event(name="call", type="aerys.nao.event.ALMethodEvent")]
 	[Event(name="result", type="aerys.nao.event.ALMethodEvent")]

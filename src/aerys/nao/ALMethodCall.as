@@ -1,16 +1,12 @@
 package aerys.nao
 {
 	import aerys.nao.event.ALMethodEvent;
+	import aerys.nao.ns.nao;
 	import aerys.nao.rpc.XMLRPCDeserializer;
-	import aerys.nao.rpc.XMLRPCType;
-	
-	import com.ak33m.rpc.xmlrpc.XMLRPCSerializer;
+	import aerys.nao.rpc.XMLRPCSerializer;
+	import aerys.nao.utils.Uuid;
 	
 	import flash.events.EventDispatcher;
-	import flash.utils.setTimeout;
-	import flash.xml.XMLDocument;
-	import aerys.nao.ns.nao;
-	import aerys.nao.utils.Uuid;
 
 	public class ALMethodCall extends EventDispatcher
 	{
@@ -69,12 +65,10 @@ package aerys.nao
 				data = XMLRPCDeserializer.deserialize(new XML(xmlString.replace(nsRegEx, "")));
 			}
 			
-			var event : ALMethodEvent = new ALMethodEvent(ALMethodEvent.RESULT,
-				_method.module.name,
-				_method.name,
-				data);
-			
-			dispatchEvent(event);
+			dispatchEvent(new ALMethodEvent(ALMethodEvent.RESULT,
+											_method.module.name,
+											_method.name,
+											data));
 		}
 	}
 }

@@ -5,6 +5,8 @@ package aerys.nao.event
 	public class ALEvent extends Event
 	{
 		public static const CONNECTED			: String	= "connected";
+		public static const AUTH_SUCCEED		: String	= "authSucceed";
+		public static const AUTH_FAILED			: String	= "authSucceed";
 		public static const DEVICE_AVAILABLE	: String	= "deviceAvailable";
 		
 		public function ALEvent(type : String)
