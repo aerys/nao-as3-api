@@ -31,6 +31,10 @@ package aerys.nao
 			super();
 			
 			_name = name;
+			if (name == "postRunBehavior")
+				_name = "post.runBehavior";
+			if (name == "postStopBehavior")
+				_name = "post.stopBehavior";
 			_broker = broker;
 			_module = module;
 		}
