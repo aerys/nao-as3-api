@@ -8,6 +8,13 @@ package aerys.nao.event
 		public static const AUTH_SUCCEED		: String	= "authSucceed";
 		public static const AUTH_FAILED			: String	= "authSucceed";
 		public static const DEVICE_AVAILABLE	: String	= "deviceAvailable";
+		public static const MESSAGE_RECEIVED	: String	= "messageReceived";
+		
+		private var _data						: *			= null;
+
+		public function get data()				: *			{ return _data; }
+		public function set data(value : *)		: void 		{ _data = value; }
+
 		
 		public function ALEvent(type : String)
 		{
@@ -16,7 +23,9 @@ package aerys.nao.event
 		
 		override public function clone() : Event
 		{
-			return new ALEvent(type);
+			var newEvent : ALEvent = new ALEvent(type);
+			newEvent._data = _data;
+			return newEvent;
 		}
 	}
 }

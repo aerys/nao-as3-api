@@ -29,7 +29,10 @@ package aerys.nao
 			addEventListener(ALMethodEvent.RESULT,
 							 function(event : ALMethodEvent) : void
 							 {
-								 callback.call(null, event.data);
+								 if (event.data != null && event.data.length > 0)
+								 	callback.apply(null, event.data);
+								 else
+								    callback.call(null, null);
 							 });
 			
 			return this;

@@ -3,6 +3,7 @@ package aerys.nao
 	import aerys.nao.event.ALEvent;
 	import aerys.nao.event.ALMethodEvent;
 	import aerys.nao.ns.nao;
+	import aerys.nao.rpc.XMLRPCDeserializer;
 	import aerys.nao.utils.ProxyEventDispatcher;
 	
 	import com.hurlant.crypto.Crypto;
@@ -120,6 +121,9 @@ package aerys.nao
 			
 			var xml 	: XML 		= new XML(event.stanza.body);
 			
+			//trace(event.stanza.body);
+			
+			
 			if (xml..NS::fault.length() != 0)
 				throw new Error((xml..NS::value.NS::string[0] as XML).toString(),
 								xml..NS::value.NS::int.toString());
@@ -132,6 +136,11 @@ package aerys.nao
 				handler(xml..NS::methodResponse[0]);
 				
 				delete _iqHandlers[iqId];
+			}
+			else
+			{
+				if (xml..NS::methodCall[0] != null)
+					orphanMessageHandler(xml..NS::methodCall[0]);
 			}
 		}
 		
@@ -185,5 +194,27 @@ package aerys.nao
 				dispatchEvent(event);
 		}
 		
+		
+		private function orphanMessageHandler(response : XML) : void
+		{
+			var data 	: Object = null;
+			var method 	: String = "";
+			var module 	: String = "";
+			
+			if (response)
+			{
+				var nsRegEx		: RegExp 	= / xmlns(?:.*?)?=\".*?\"/gim;
+				var xmlString	: String	= response.toString();
+				
+				var methodname : Array = (response..NS::methodName.toString()).split(".");
+				
+				module = methodname[0];
+				method = methodname[1];
+					
+				data = XMLRPCDeserializer.deserialize(new XML(xmlString.replace(nsRegEx, "")));
+			}
+
+			dispatchEvent(new ALMethodEvent(ALMethodEvent.MESSAGE_RECEIVED, module, method, data));
+		}
 	}
 }

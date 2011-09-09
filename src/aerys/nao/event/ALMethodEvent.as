@@ -4,8 +4,9 @@ package aerys.nao.event
 	
 	public class ALMethodEvent extends Event
 	{
-		public static const RESULT	: String	= "result";
-		public static const CALL	: String	= "call";
+		public static const RESULT				: String	= "result";
+		public static const CALL				: String	= "call";
+		public static const MESSAGE_RECEIVED	: String	= "messageReceived";
 		
 		private var _module	: String	= null;
 		private var _method	: String	= null;

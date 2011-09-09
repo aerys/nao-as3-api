@@ -6,12 +6,21 @@ package aerys.nao.rpc
 	{
 		public static function deserialize (xmlresult : XML) : Object
 		{
-			var resultvaluexml	: XMLList 	= xmlresult.params.param.value;
+			var resultparamxml	: XMLList	= xmlresult.params.param;
 			var faultxml		: XMLList 	= xmlresult.fault.value;
+				
+			var result			: Array	= [];
 			
-			if (resultvaluexml.toString() != "")
+			if (resultparamxml.toString() != "")
 			{
-				return deserializeObject(resultvaluexml);
+				var i : int = 0;
+				for each(var resultparam : XML in resultparamxml)
+				{
+					if (resultparam.value.toString() != "")
+						result.push(deserializeObject(resultparam.value));
+				}
+				
+				return result;
 			}
 			else if (faultxml)
 			{
@@ -32,6 +41,7 @@ package aerys.nao.rpc
 		{
 			var typeName : String = robject.children()[0].name();
 			
+			//trace(typeName);
 			if (typeName == XMLRPCType.STRING)
 				return String(robject.string);
 			else if (typeName == XMLRPCType.INT)
@@ -44,18 +54,18 @@ package aerys.nao.rpc
 				return new Number(robject.float);
 			else if (typeName == XMLRPCType.BOOLEAN)
 			{
-				if (isNaN(robject.boolean))
+				if (isNaN(robject.bool))
 				{
-					if (String(robject.boolean).toLowerCase() == "true")
+					if (String(robject.bool).toLowerCase() == "true")
 						return true;
-					else if (String(robject.boolean).toLowerCase() == "false")
+					else if (String(robject.bool).toLowerCase() == "false")
 						return false;
 					else
 						return null;
 				}
 				else
 				{
-					return Boolean(Number(robject.boolean));
+					return Boolean(Number(robject.bool));
 				}
 			}
 			else if (typeName == XMLRPCType.DATE)
