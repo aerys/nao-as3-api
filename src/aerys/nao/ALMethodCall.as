@@ -53,7 +53,10 @@ package aerys.nao
 			var post		: String 	= "</query></iq>";
 			
 			broker.addIqHandler(uuid.toString(), responseHandler);
-			broker.send(prev + command_s + post);
+			if (method.module.name == "AWPreferences")
+				broker.sendToPreferencesProxy(prev + command_s + post);
+			else
+				broker.send(prev + command_s + post);
 		}
 		
 		private function responseHandler(response : XML) : void

@@ -91,7 +91,7 @@ package aerys.nao.rpc
 				var tarray : Array = new Array();
 				
 				for each (var value : * in robject.array.data.value)
-				tarray.push(deserializeObject(value));
+					tarray.push(deserializeObject(value));
 				
 				return tarray;
 			}
@@ -100,7 +100,7 @@ package aerys.nao.rpc
 				var tvalue	: Object = new Object();
 				
 				for each (var member : * in robject.struct.member)
-				tvalue[member.name] = deserializeObject(member.value);
+					tvalue[member.name] = deserializeObject(member.value);
 				
 				return tvalue;
 			}

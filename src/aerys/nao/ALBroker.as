@@ -31,8 +31,10 @@ package aerys.nao
 		private static const NS		: Namespace	= new Namespace("jabber:iq:rpc");
 		
 		private var _username		: String			= null;
+		private var _host			: String			= null;
 		
 		private var _xmpp			: XMPP				= null;
+		private var _prefxmpp		: XMPP				= null;
 		private var _connected		: Boolean			= false;
 		
 		private var _modules		: Object			= new Object();
@@ -52,18 +54,24 @@ package aerys.nao
 		
 		public function connect(host 		: String,
 								username 	: String,
-								password 	: String) : void
+								password 	: String = "") : void
 		{
-			_username = username;
+			_username 	= username;
+			_host 		= host;
 			
 			var hash			: IHash 	= Crypto.getHash("sha1");
 			var result			: ByteArray = hash.hash(Hex.toArray(Hex.fromString(password)));
 			var passwordHash	: String 	= Hex.fromArray(result);
 			
 			_xmpp = new XMPP();
-			_xmpp.setJID(username)
-				 .setPassword(passwordHash)
-				 .setServer(host);
+			
+			if (password != "")
+				_xmpp.setJID(username)
+					 .setPassword(passwordHash)
+					 .setServer(host);
+			else
+				_xmpp.setJID(username)
+					 .setServer(host);
 
 			_xmpp.addEventListener(XMPPEvent.MESSAGE, messageHandler);
 			/*_xmpp.addEventListener(XMPPEvent.MESSAGE_MUC, handleMUCMessage);*/
@@ -160,10 +168,15 @@ package aerys.nao
 			
 			dispatchEvent(new ALEvent(ALEvent.DEVICE_AVAILABLE));
 		}
-
+		
 		nao function send(data : String, to : String = null) : void
 		{
 			_xmpp.sendMessage(_username + "/" + _currentDevice, data);
+		}
+		
+		nao function sendToPreferencesProxy(data : String, to : String = null) : void
+		{
+			_xmpp.sendMessage("_preferences@" + _host +  "/" + _currentDevice, data);
 		}
 		
 		nao function addIqHandler(iq : String, handler : Function) : void
