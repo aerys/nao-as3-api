@@ -222,7 +222,10 @@ package aerys.nao
 				var methodname : Array = (response..NS::methodName.toString()).split(".");
 				
 				module = methodname[0];
-				method = methodname[1];
+				if(methodname[1] == "post")
+					method = methodname[2];
+				else
+					method = methodname[1];
 					
 				data = XMLRPCDeserializer.deserialize(new XML(xmlString.replace(nsRegEx, "")));
 			}
