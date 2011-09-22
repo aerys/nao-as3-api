@@ -130,10 +130,7 @@ package aerys.nao
 				return ;
 			
 			var xml 	: XML 		= new XML(event.stanza.body);
-			
-			//trace(event.stanza.body);
-			
-			
+						
 			if (xml..NS::fault.length() != 0)
 				throw new Error((xml..NS::value.NS::string[0] as XML).toString(),
 								xml..NS::value.NS::int.toString());
@@ -188,7 +185,15 @@ package aerys.nao
 		
 		nao function addSubscribeIqHandler(iq : String, handler : Function) : void
 		{
-			_subcribeIqHandlers[iq] = handler;
+			if (!_subcribeIqHandlers.hasOwnProperty(iq))
+				_subcribeIqHandlers[iq] = new Array();
+			_subcribeIqHandlers[iq].push(handler);
+		}
+		
+		nao function removeSubscribeIqHandler(iq : String) : void
+		{
+			if (_subcribeIqHandlers.hasOwnProperty(iq))
+				delete _subcribeIqHandlers[iq];
 		}
 		
 		override protected function getProperty(name : *) : *
@@ -243,9 +248,10 @@ package aerys.nao
 				data = XMLRPCDeserializer.deserialize(new XML(xmlString.replace(nsRegEx, "")));
 				
 				if (module == "ALSubscriber")	
-				{					
-					var handler : Function = _subcribeIqHandlers[method];
-					handler(data[1]);
+				{
+					var handlers : Array = _subcribeIqHandlers[method];
+					for each(var handler : Function in handlers)
+						handler(data[1]);
 				}
 				else
 				{
