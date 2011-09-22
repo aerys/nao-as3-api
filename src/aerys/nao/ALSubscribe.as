@@ -2,9 +2,6 @@ package aerys.nao
 {
 	import aerys.nao.ns.nao;
 	import aerys.nao.utils.MD5;
-	import aerys.nao.utils.Uuid;
-	
-	import flash.utils.ByteArray;
 
 	public class ALSubscribe
 	{
@@ -26,9 +23,7 @@ package aerys.nao
 		}
 		public function unsubscribe(event : String) : void
 		{
-			var md5Hash : String = MD5.hash(event);
-			
-			_broker.removeSubscribeIqHandler(md5Hash);
+			_broker.removeSubscribeIqHandler(MD5.hash(event));
 			_broker.ALMemory.post_unsubscribeToMicroEvent(event, "ALTelepathe");
 		}
 	}
