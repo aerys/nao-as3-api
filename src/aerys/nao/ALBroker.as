@@ -28,21 +28,23 @@ package aerys.nao
 	{
 		use namespace nao;
 		
-		private static const NS		: Namespace	= new Namespace("jabber:iq:rpc");
+		private static const NS			: Namespace	= new Namespace("jabber:iq:rpc");
 		
-		private var _username		: String			= null;
-		private var _host			: String			= null;
+		private var _username			: String			= null;
+		private var _host				: String			= null;
 		
-		private var _xmpp			: XMPP				= null;
-		private var _prefxmpp		: XMPP				= null;
-		private var _connected		: Boolean			= false;
+		private var _xmpp				: XMPP				= null;
+		private var _prefxmpp			: XMPP				= null;
+		private var _connected			: Boolean			= false;
 		
-		private var _modules		: Object			= new Object();
-		private var _iqHandlers		: Object			= new Object();
+		private var _modules			: Object			= new Object();
+		private var _iqHandlers			: Object			= new Object();
+		private var _subcribeIqHandlers	: Object			= new Object();
 		
-		private var _devices		: Array				= new Array();
-		private var _currentDevice	: String			= null;
+		private var _devices			: Array				= new Array();
+		private var _currentDevice		: String			= null;
 		
+		public function get username()		: String	{ return _username; }
 		public function get connected()		: Boolean	{ return _connected; }
 		public function get devices() 		: Array		{ return _devices; }
 		public function get currentDevice() : String	{ return _currentDevice; }
@@ -184,9 +186,21 @@ package aerys.nao
 			_iqHandlers[iq] = handler;
 		}
 		
-		override protected function getProperty(name : *) : *
+		nao function addSubscribeIqHandler(iq : String, handler : Function) : void
 		{
+			_subcribeIqHandlers[iq] = handler;
+		}
+		
+		override protected function getProperty(name : *) : *
+		{			
 			var moduleName 	: String 	= name;
+			
+			if(moduleName == "ALSubscribe")
+			{
+				if (!_modules.hasOwnProperty(moduleName))
+					_modules[moduleName] = new ALSubscribe(this);
+				return _modules[moduleName];
+			}
 			var module		: ALModule	= _modules[moduleName];
 			
 			if (!module)
@@ -194,7 +208,6 @@ package aerys.nao
 				module = new ALModule(moduleName, this);
 				module.addEventListener(ALMethodEvent.CALL, methodHandler);
 				module.addEventListener(ALMethodEvent.RESULT, methodHandler);
-				
 				_modules[moduleName] = module;
 			}
 			
@@ -226,11 +239,19 @@ package aerys.nao
 					method = methodname[2];
 				else
 					method = methodname[1];
-					
-				data = XMLRPCDeserializer.deserialize(new XML(xmlString.replace(nsRegEx, "")));
-			}
 
-			dispatchEvent(new ALMethodEvent(ALMethodEvent.MESSAGE_RECEIVED, module, method, data));
+				data = XMLRPCDeserializer.deserialize(new XML(xmlString.replace(nsRegEx, "")));
+				
+				if (module == "ALSubscriber")	
+				{					
+					var handler : Function = _subcribeIqHandlers[method];
+					handler(data[1]);
+				}
+				else
+				{
+					dispatchEvent(new ALMethodEvent(ALMethodEvent.MESSAGE_RECEIVED, module, method, data));
+				}
+			}
 		}
 	}
 }
