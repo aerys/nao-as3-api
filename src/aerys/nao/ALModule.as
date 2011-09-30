@@ -1,12 +1,13 @@
 package aerys.nao
 {
 	import aerys.nao.event.ALMethodEvent;
+	import aerys.nao.utils.ProxyEventDispatcher;
 	
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	import flash.utils.Proxy;
+	import flash.utils.describeType;
 	import flash.utils.flash_proxy;
-	import aerys.nao.utils.ProxyEventDispatcher;
 	
 	[Event(name="call", type="aerys.nao.event.ALMethodEvent")]
 	[Event(name="result", type="aerys.nao.event.ALMethodEvent")]
@@ -54,6 +55,53 @@ package aerys.nao
 		private function methodHandler(event : ALMethodEvent) : void
 		{
 			dispatchEvent(event);
+		}
+		
+		public function exit() : void
+		{
+			
+		}
+		
+		public function version() : String
+		{
+			return null;
+		}
+		
+		public function ping() : Boolean
+		{
+			return false;
+		}
+		
+		public function getMethodList() : Array
+		{
+			var xml			: XML		= describeType(this);
+			var methods		: XMLList	= xml..method;
+			var methodsList	: Array		= new Array();
+			
+			for each (var method : XML in methods)
+				methodsList.push(method.@name);
+				
+			return methodsList;
+		}
+		
+		public function getMethodHelp(methodName : String) : Object
+		{
+			return null;
+		}
+		
+		public function getModuleHelp() : Object
+		{
+			return null;
+		}
+		
+		public function getBrokerName() : String
+		{
+			return null;
+		}
+		
+		public function getUsage(methodName : String) : String
+		{
+			return null;
 		}
 	}
 }

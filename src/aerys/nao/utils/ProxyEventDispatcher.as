@@ -66,12 +66,17 @@ package aerys.nao.utils
 		
 		protected function getProperty(name : *) : *
 		{
-			// nothing
+			throw new Error();
 		}
 		
 		protected function callProperty(name : *, ...parameters) : *
 		{
-			// nothing
+			throw new Error();
+		}
+		
+		protected function setProperty(name : *, value : *) : void
+		{
+			throw new Error();
 		}
 	}
 }

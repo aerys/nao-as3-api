@@ -18,6 +18,7 @@ package aerys.nao
 	import com.seesmic.as3.xmpp.XMPPEvent;
 	
 	import flash.utils.ByteArray;
+	import flash.utils.flash_proxy;
 	
 	[Event(name="connected", type="aerys.nao.event.ALEvent")]
 	[Event(name="deviceAvailable", type="aerys.nao.event.ALEvent")]
@@ -129,8 +130,8 @@ package aerys.nao
 			if (!event.stanza.body)
 				return ;
 			
-			var xml 	: XML 		= new XML(event.stanza.body);
-						
+			var xml : XML	= new XML(event.stanza.body);
+			
 			if (xml..NS::fault.length() != 0)
 				throw new Error((xml..NS::value.NS::string[0] as XML).toString(),
 								xml..NS::value.NS::int.toString());
@@ -217,6 +218,13 @@ package aerys.nao
 			}
 			
 			return module;
+		}
+		
+		override protected function setProperty(name : *, value : *) : void
+		{
+			var module : ALModule = ALModule(value);
+			
+			_modules[module.name] = module;
 		}
 		
 		private function methodHandler(event : ALMethodEvent) : void
